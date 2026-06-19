@@ -33,7 +33,7 @@ services:
     container_name: cityflow-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     command: redis-server --requirepass cityflow2025 --appendonly yes
