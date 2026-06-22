@@ -23,6 +23,8 @@ File structure
 			init.cql (création keyspace + tables + données)
 		neo4j/
 			init.cypher (création nœuds et relations)
+	TPs/
+		mes_commandes_redis.md (réponses aux questions du TP)
 	queries/
 		mongodb-queries.md (requêtes user stories M1-M4)
 		redis-queries.md (requêtes user stories R1-R4)
