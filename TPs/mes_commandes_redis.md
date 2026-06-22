@@ -40,16 +40,26 @@ Niveau 4 — Sets
 	`SADD user:2:tags "onetag" "mytag" "omg"`
 	`SADD user:3:tags "onetag" "twotag" "gotag"`
 15. Trouvez les tags communs aux 3 utilisateurs.
+`SINTER user:1:tags user:2:tags user:3:tags`
 16. Trouvez les tags présents chez user:1 mais absents chez user:2.
+`SDIFF user:1:tags user:2:tags`
 17. Tirez au sort un tag parmi ceux de user:1.
+`SRANDMEMBER user:1:tags`
 
 Niveau 5 — Sorted Sets
 ----------------------
 18. Ajoutez 10 joueurs à leaderboard:season1 avec des scores variés.
+`ZADD leaderboard:season1 1500 "alice" 1800 "bob" 2100 "carol" 1750 "dave" 980 "eve" 2300 "frank" 1340 "gina" 1670 "hugo" 2050 "ines" 870 "jules"`
 19. Affichez le top 5 par score décroissant avec leurs scores.
+`ZREVRANGE leaderboard:season1 0 4 WITHSCORES`
 20. Affichez les joueurs ayant entre 1000 et 2000 points.
+`ZRANGEBYSCORE leaderboard:season1 1000 2000 WITHSCORES`
 21. Récupérez le rang de votre joueur préféré.
+`ZREVRANK leaderboard:season1 "carol"`
 22. Calculez combien de joueurs ont plus de 1500 points (ZCOUNT).
+`ZCOUNT leaderboard:season1 1501 +inf`
 23. Combinez deux Sorted Sets en un troisième : ZUNIONSTORE (recherchez la commande).
+`ZUNIONSTORE leaderboard:combined 2 leaderboard:weekly leaderboard:alltime`
 24. Renommez la clé leaderboard:season1 en leaderboard:archive:season1 (recherchez
 RENAME).
+`ZUNIONSTORE leaderboard:combined 2 leaderboard:weekly leaderboard:alltime`
