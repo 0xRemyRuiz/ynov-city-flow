@@ -20,7 +20,7 @@ Parce que les compétences sont partagées entre utilisateurs. En faire des nœu
 
 jeu de donne
 // Utilisateurs
-CREATE (alice:User {name: 'Alice', email: 'alice@example.com', photo: 'alice.jpg'})     aaa@gmail.com
+CREATE (alice:User {name: 'Alice', email: 'alice@example.com', photo: 'alice.jpg'})     
 CREATE (bob:User {name: 'Bob', email: 'bob@example.com', photo: 'bob.jpg'})
 CREATE (charlie:User {name: 'Charlie', email: 'charlie@example.com', photo: 'charlie.jpg'})
 CREATE (diana:User {name: 'Diana', email: 'diana@example.com', photo: 'diana.jpg'})
