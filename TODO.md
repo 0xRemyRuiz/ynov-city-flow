@@ -17,7 +17,7 @@
  - [ ] queries (titres à remplir)
 
 ## Neo4j
- - [ ] seed
+ - [ ] seed (complète pour la partie TP)
  - [ ] modelisation
  - [ ] TPs (à clean et tester)
  - [ ] queries
