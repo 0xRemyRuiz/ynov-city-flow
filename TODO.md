@@ -1,26 +1,28 @@
-# Global
- [ ] Architecture
- [ ] README
+# What to do?.. What to do?..
 
-# Mongodb
+## Global
+ [ ] Architecture
+ [ ] README (à compléter)
+
+## Mongodb
  [X] seed
  [ ] modelisation
  [X] TPs
  [ ] queries (1/4)
 
-# Redis
+## Redis
  [X] seed
  [ ] modelisation
  [ ] TPs (à compléter)
- [ ] queries
+ [ ] queries (titres à remplir)
 
-# Neo4j
+## Neo4j
  [ ] seed
  [ ] modelisation
  [ ] TPs (à clean et tester)
  [ ] queries
 
-# Cassandra
+## Cassandra
  [ ] seed
  [ ] modelisation
  [ ] TPs
