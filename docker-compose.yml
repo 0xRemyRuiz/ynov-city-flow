@@ -1,62 +1,64 @@
 services:
-  mongodb:
-    image: mongo:7.0
-    container_name: cityflow-mongo
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    volumes:
-      - ./seed/mongodb/init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - mongo_data:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: cityflow2025
-    networks:
-      - cityflow-net
-
-  mongo-express:
-    image: mongo-express:1.0.2
-    container_name: cityflow-mongo-express
-    restart: unless-stopped
-    ports:
-      - "8081:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: cityflow2025
-      ME_CONFIG_MONGODB_URL: mongodb://admin:cityflow2025@mongodb:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: student
-      ME_CONFIG_BASICAUTH_PASSWORD: nosql2025
-    depends_on:
-      - mongodb
-    networks:
-      - cityflow-net
-
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: cityflow-redis
+  # mongodb:
+  #   image: mongo:7.0
+  #   container_name: cityflow-mongo
   #   restart: unless-stopped
   #   ports:
-  #     - "6380:6379"
+  #     - "27017:27017"
   #   volumes:
-  #     - redis_data:/data
-  #   command: redis-server --requirepass cityflow2025 --appendonly yes
+  #     - ./seed/mongodb/init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+  #     - mongo_data:/data/db
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: admin
+  #     MONGO_INITDB_ROOT_PASSWORD: cityflow2025
   #   networks:
   #     - cityflow-net
 
-  # redis-commander:
-  #   image: rediscommander/redis-commander:latest
-  #   container_name: cityflow-redis-commander
+  # mongo-express:
+  #   image: mongo-express:1.0.2
+  #   container_name: cityflow-mongo-express
   #   restart: unless-stopped
   #   ports:
-  #     - "8082:8081"
+  #     - "8081:8081"
   #   environment:
-  #     REDIS_HOSTS: local:redis:6379:0:cityflow2025
-  #     HTTP_USER: student
-  #     HTTP_PASSWORD: nosql2025
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: cityflow2025
+  #     ME_CONFIG_MONGODB_URL: mongodb://admin:cityflow2025@mongodb:27017/
+  #     ME_CONFIG_BASICAUTH_USERNAME: student
+  #     ME_CONFIG_BASICAUTH_PASSWORD: nosql2025
   #   depends_on:
-  #     - redis
+  #     - mongodb
   #   networks:
   #     - cityflow-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: cityflow-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - ./seed/redis/init.txt:/tmp/init.txt:ro
+      - ./seed/redis/entry.sh:/tmp/entrypoint.sh:ro
+      - redis_data:/data
+    command: sh /tmp/entrypoint.sh
+    networks:
+      - cityflow-net
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: cityflow-redis-commander
+    restart: unless-stopped
+    ports:
+      - "8082:8081"
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:cityflow2025
+      HTTP_USER: student
+      HTTP_PASSWORD: nosql2025
+    depends_on:
+      - redis
+    networks:
+      - cityflow-net
 
   # cassandra:
   #   image: cassandra:4.1

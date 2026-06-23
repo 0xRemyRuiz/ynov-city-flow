@@ -1,0 +1,25 @@
+#!/bin/sh
+
+if [ "$1" = "boot" ]; then
+	sudo docker compose down -v && sudo docker compose up
+elif [ "$1" = "check" ]; then
+	echo "Checking if debug commands remains"
+	grep -ri "debug!" ./
+elif [ "$1" = "exec" ]; then
+	if [ "$2" = "" ]; then
+		echo "ERROR: $0 exec command needs an argument"
+		exit 1
+	fi
+	sudo docker exec -it $2 /bin/sh
+elif [ "$1" = "test" ]; then
+	if [ "$2" = "" ]; then
+		echo "ERROR: $0 exec command needs an argument"
+		exit 1
+	fi
+	sudo docker compose down -v && sudo docker compose up -d && sudo docker exec -it $2 /bin/sh
+else
+	echo "$0 is a tiny command wrapper to ease debugging"
+	echo "Usage: $0 [boot|check|exec container_name|test container_name]"
+fi
+
+exit 0
