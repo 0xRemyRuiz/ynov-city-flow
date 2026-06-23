@@ -9,9 +9,9 @@
  [ ] queries (1/4)
 
 # Redis
- [ ] seed
+ [X] seed
  [ ] modelisation
- [ ] TPs (à clean et compléter)
+ [ ] TPs (à compléter)
  [ ] queries
 
 # Neo4j

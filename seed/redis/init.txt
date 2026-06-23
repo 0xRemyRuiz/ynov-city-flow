@@ -20,3 +20,32 @@ ZADD tp:leaderboard:alltime 12450 "tp:user:1" 8900 "tp:user:2" 25100 "tp:user:3"
 
 
 
+
+
+HMSET cityflow:station:lyon1:hotel_de_ville name "Hôtel de Ville" city "Lyon 1er" bikes 12 scooters 4 total_slots 20 EX 60
+HMSET cityflow:station:lyon1:opera name "Opéra" city "Lyon 1er" bikes 5 scooters 2 total_slots 10 EX 60
+HMSET cityflow:station:lyon1:sathonay name "Place Sathonay" city "Lyon 1er" bikes 8 scooters 0 total_slots 12 EX 60
+HMSET cityflow:station:lyon2:bellecour_nord name "Bellecour Nord" city "Lyon 2e" bikes 22 scooters 8 total_slots 35 EX 60
+HMSET cityflow:station:lyon2:bellecour_sud name "Bellecour Sud" city "Lyon 2e" bikes 14 scooters 3 total_slots 20 EX 60
+HMSET cityflow:station:lyon2:perrache name "Gare Perrache" city "Lyon 2e" bikes 30 scooters 12 total_slots 50 EX 60
+HMSET cityflow:station:lyon2:jacobins name "Place des Jacobins" city "Lyon 2e" bikes 9 scooters 1 total_slots 15 EX 60
+HMSET cityflow:station:lyon3:partdieu_vivier name "Part-Dieu Vivier Merle" city "Lyon 3e" bikes 45 scooters 15 total_slots 70 EX 60
+HMSET cityflow:station:lyon3:partdieu_villette name "Part-Dieu Villette" city "Lyon 3e" bikes 28 scooters 7 total_slots 40 EX 60
+HMSET cityflow:station:lyon3:prefecture name "Préfecture" city "Lyon 3e" bikes 11 scooters 4 total_slots 20 EX 60
+HMSET cityflow:station:lyon6:foch name "Foch" city "Lyon 6e" bikes 16 scooters 5 total_slots 25 EX 60
+HMSET cityflow:station:lyon6:massena name "Masséna" city "Lyon 6e" bikes 10 scooters 2 total_slots 15 EX 60
+HMSET cityflow:station:villeurbanne:charpennes name "Charpennes" city "Villeurbanne" bikes 25 scooters 9 total_slots 40 EX 60
+HMSET cityflow:station:villeurbanne:gratte_ciel name "Gratte-Ciel" city "Villeurbanne" bikes 18 scooters 3 total_slots 25 EX 60
+HMSET cityflow:station:villeurbanne:doua name "Campus de la Doua" city "Villeurbanne" bikes 35 scooters 2 total_slots 45 EX 60
+
+SET cityflow:session:token_alice "{\"userId\":\"u001\",\"device\":\"iPhone 15\",\"ip\":\"192.168.1.45\",\"lat\":45.7578,\"lng\":4.8320}" EX 1800
+SET cityflow:session:token_bob "{\"userId\":\"u002\",\"device\":\"Samsung S24\",\"ip\":\"192.168.1.89\",\"lat\":45.7640,\"lng\":4.8357}" EX 1800
+SET cityflow:session:token_charlie "{\"userId\":\"u003\",\"device\":\"MacBook Pro\",\"ip\":\"82.123.45.67\",\"lat\":45.7712,\"lng\":4.8781}" EX 1800
+SET cityflow:session:token_david "{\"userId\":\"u004\",\"device\":\"Google Pixel 8\",\"ip\":\"90.44.12.102\",\"lat\":45.7501,\"lng\":4.8264}" EX 1800
+SET cityflow:session:token_emma "{\"userId\":\"u005\",\"device\":\"Xiaomi 14\",\"ip\":\"176.158.4.12\",\"lat\":45.7607,\"lng\":4.8510}" EX 1800
+
+ZADD cityflow:leaderboard:monthly 1250 "user:u001" cityflow:leaderboard:monthly 980 "user:u002" cityflow:leaderboard:monthly 2450 "user:u003" cityflow:leaderboard:monthly 410 "user:u004" cityflow:leaderboard:monthly 1560 "user:u005" cityflow:leaderboard:monthly 320 "user:u006" cityflow:leaderboard:monthly 1890 "user:u007" cityflow:leaderboard:monthly 2100 "user:u008" cityflow:leaderboard:monthly 750 "user:u009" cityflow:leaderboard:monthly 1120 "user:u010" cityflow:leaderboard:monthly 640 "user:u011" cityflow:leaderboard:monthly 1430 "user:u012" cityflow:leaderboard:monthly 2950 "user:u013" cityflow:leaderboard:monthly 850 "user:u014" cityflow:leaderboard:monthly 1740 "user:u015" cityflow:leaderboard:monthly 530 "user:u016" cityflow:leaderboard:monthly 2210 "user:u017" cityflow:leaderboard:monthly 1350 "user:u018" cityflow:leaderboard:monthly 910 "user:u019" cityflow:leaderboard:monthly 1980 "user:u020"
+
+SET cityflow:ratelimit:u001:search 4 EX 91
+SET cityflow:ratelimit:u002:search 9 EX 45
+SET cityflow:ratelimit:u003:search 11 EX 67
