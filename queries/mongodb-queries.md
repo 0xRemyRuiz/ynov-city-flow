@@ -2,9 +2,8 @@
 US-M1 : profil + 10 derniers trajets
 ------------------------------------
  - Requêtes : 
-  1. `db.trips.createIndex({ userId: 1, startTime: -1 });`
-  2. `db.users.findOne({ _id: "u001" });`
-  3. `db.trips.find({ userId: "u001" }).sort({ startTime: -1 }).limit(10);`
+  1. `db.users.findOne({ _id: "u001" });`
+  2. `db.trips.find({ userId: "u001" }).sort({ startTime: -1 }).limit(10);`
  - Justification : On a préféré 2 requêtes pour des questions de performance tout d'abord. En effet mongodb est optimisé pour des petites requêtes. On a fait ce choix également pour avoir la possibilité de faire évoluer l'application facilement mais également la possibilité de mettre en cache l'une ou l'autre des parties. Par exemple il se peut que le profil évolue moins souvent de les voyages. Ou inversement, il se peut que les voyages soient bien plus souvent consultés. Cela permettrait de gérer le rafraîchissement intempestif de l'application.
  - Réponse :
   1.

@@ -833,6 +833,7 @@ if (!databaseExists(curr_db_name)) {
 curr_db_name = "cityflow"
 // DEBUG!
 db.dropDatabase(curr_db_name)
+// !DEBUG
 if (!databaseExists(curr_db_name)) {
   const database = db.getSiblingDB(curr_db_name)
   database.createCollection(init_collection_name)
