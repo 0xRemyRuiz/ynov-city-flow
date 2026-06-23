@@ -1,0 +1,22 @@
+SET tp:pageviews:home 1245
+SET tp:pageviews:about 432
+SET tp:pageviews:contact 89
+SET tp:session:abc123 "{\"userId\":\"u001\",\"role\":\"admin\"}" EX 1800
+SET tp:session:xyz789 "{\"userId\":\"u014\",\"role\":\"user\"}" EX 1800
+
+HMSET tp:user:1:profile firstName "Alice" lastName "Dupont" email "alice.dupont@example.com" age 58 city "Lyon 2e"
+HMSET tp:user:2:profile firstName "Bob" lastName "Martin" email "bob.martin@example.com" age 34 city "Lyon 3e"
+HMSET tp:user:3:profile firstName "Charlie" lastName "Durand" email "charlie.durand@example.com" age 25 city "Villeurbanne"
+
+LPUSH tp:user:1:notifications "Your trip t001 has ended successfully." "Payment of 10.64€ confirmed." "Welcome to CityFlow!"
+LPUSH tp:user:2:notifications "Vehicle v009 battery level is low." "New promotion available in Lyon 1er!"
+
+SADD tp:user:1:tags "heavy-user" "electric-only" "morning-commuter"
+SADD tp:user:2:tags "casual" "eco-friendly"
+SADD tp:user:3:tags "heavy-user" "night-rider" "student"
+
+ZADD tp:leaderboard:weekly 150 "tp:user:1" 120 "tp:user:2" 310 "tp:user:3" 90 "tp:user:4" 215 "tp:user:5" 45 "tp:user:6" 180 "tp:user:7" 300 "tp:user:8" 75 "tp:user:9" 110 "tp:user:10"
+ZADD tp:leaderboard:alltime 12450 "tp:user:1" 8900 "tp:user:2" 25100 "tp:user:3" 4300 "tp:user:4" 15600 "tp:user:5" 1200 "tp:user:6" 19800 "tp:user:7" 31000 "tp:user:8" 5400 "tp:user:9" 9800 "tp:user:10"
+
+
+
