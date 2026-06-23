@@ -8,7 +8,8 @@ Niveau 1 — Filtres simples
 --------------------------
 1. Trouvez tous les utilisateurs entre 25 et 35 ans (inclus aux deux bornes).
  - Requête : `db.users.find({ age: { "$gte": 25, "$lte": 35 } })`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a3'),
     email: 'alice.dupont@example.com',
@@ -74,10 +75,11 @@ Niveau 1 — Filtres simples
       notifications: { email: true, sms: false }
     }
   }
-]`
+]```
 2. Trouvez les utilisateurs dont l'email contient example.com (indice : opérateur $regex).
  - Requête : `db.users.find({ email: { "$regex": "example.com$" } })`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a3'),
     email: 'alice.dupont@example.com',
@@ -156,10 +158,11 @@ Niveau 1 — Filtres simples
     ],
     tags: [ 'premium', 'early-adopter', 'eco-friendly' ]
   }
-]`
+]```
 3. Trouvez les utilisateurs qui ont exactement 2 adresses.
  - Requête : `db.users.find({ addresses: { "$size": 2 } })`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a5'),
     email: 'chloe.bernard@mail.com',
@@ -183,10 +186,11 @@ Niveau 1 — Filtres simples
     ],
     tags: [ 'premium' ]
   }
-]`
+]```
 4. Trouvez les utilisateurs qui n'ont pas le champ preferences.
  - Requête : `db.users.find({ preferences: { $exists: false } })`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a3'),
     email: 'alice.dupont@example.com',
@@ -282,7 +286,7 @@ Niveau 1 — Filtres simples
     ],
     tags: []
   }
-]`
+]```
 
 Niveau 2 — Combinaisons
 -----------------------
@@ -291,7 +295,8 @@ Niveau 2 — Combinaisons
   "addresses.city": { "$in": ["Lyon", "Villeurbanne"] },
   "age": { "$gt": 25 }
 })`
-  - Réponse : `[
+  - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a3'),
     email: 'alice.dupont@example.com',
@@ -369,10 +374,11 @@ Niveau 2 — Combinaisons
     ],
     tags: []
   }
-]`
+]```
 6. Trouvez les utilisateurs qui ont au moins une adresse de type home à Lyon.
  - Requête : `db.users.find({ addresses: { "$elemMatch": { "type": "home", "city": "Lyon" } } })`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a3'),
     email: 'alice.dupont@example.com',
@@ -427,10 +433,11 @@ Niveau 2 — Combinaisons
     ],
     tags: [ 'premium', 'early-adopter', 'eco-friendly' ]
   }
-]`
+]```
 7. Trouvez les utilisateurs qui ont les tags premium ET eco-friendly ensemble.
  - Requête : `db.users.find({ tags: { "$all": ["premium", "eco-friendly"] } })`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a7'),
     email: 'emma.moreau@example.com',
@@ -449,20 +456,22 @@ Niveau 2 — Combinaisons
     ],
     tags: [ 'premium', 'early-adopter', 'eco-friendly' ]
   }
-]`
+]```
 
 Niveau 3 — Tri et pagination
 ----------------------------
 8. Affichez les 3 utilisateurs les plus âgés, en ne renvoyant que firstName, age et email.
  - Requête : `db.users.find({}, { _id: 0, firstName: 1, age: 1, email: 1 }).sort({ age: -1 }).limit(3)`
- - Réponse : `[
+ - Réponse : ```json
+[
   { email: 'francois.roux@mail.com', firstName: 'François', age: 60 },
   { email: 'emma.moreau@example.com', firstName: 'Emma', age: 52 },
   { email: 'chloe.bernard@mail.com', firstName: 'Chloé', age: 34 }
-]`
+]```
 9. Affichez les utilisateurs triés par ville (alphabétique), puis par âge décroissant.
  - Requête : `db.users.find().sort({ "addresses.city": 1, age: -1 })`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a7'),
     email: 'emma.moreau@example.com',
@@ -582,10 +591,11 @@ Niveau 3 — Tri et pagination
       notifications: { email: true, sms: false }
     }
   }
-]`
+]```
 10. Implémentez une pagination : page 2 avec 2 utilisateurs par page, triés par createdAt.
  - Requête : `db.users.find().sort({ createdAt: 1 }).skip(2).limit(2)`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a6'),
     email: 'david.petit@example.com',
@@ -633,14 +643,15 @@ Niveau 3 — Tri et pagination
     ],
     tags: [ 'premium' ]
   }
-]`
+]```
 
 
 Niveau 4 — Bonus pour les rapides
 ---------------------------------
 11. Trouvez les utilisateurs vérifiés âgés de moins de 30 ans, n'habitant pas Lyon.
  - Requête : `db.users.find({ isVerified: true, age: { "$lt": 30 }, "addresses.city": { "$ne": "Lyon" } })`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a6'),
     email: 'david.petit@example.com',
@@ -665,11 +676,12 @@ Niveau 4 — Bonus pour les rapides
       notifications: { email: true, sms: false }
     }
   }
-]`
+]```
 12. Trouvez les utilisateurs dont au moins un tag commence par la lettre 'p' (indice : $regex dans
 un tableau).
  - Requête : `db.users.find({ "tags": { "$regex": "^p" } })`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a3'),
     email: 'alice.dupont@example.com',
@@ -729,7 +741,7 @@ un tableau).
     ],
     tags: [ 'premium', 'early-adopter', 'eco-friendly' ]
   }
-]`
+]```
 
 PARTIE 9
 ========
@@ -747,7 +759,9 @@ Niveau 1 — Agrégations simples
       oldest: { $max: "$age" }
   }}
 ])`
- - Réponse : `[ { _id: null, avgAge: 36.166666666666664, youngest: 18, oldest: 60 } ]`
+ - Réponse : ```json
+[ { _id: null, avgAge: 36.166666666666664, youngest: 18, oldest: 60 } ]
+```
 3. Comptez combien d'utilisateurs sont vérifiés (et combien ne le sont pas). 
  - Requête : `db.users.aggregate([
   { $group: {
@@ -755,11 +769,12 @@ Niveau 1 — Agrégations simples
       count: { $sum: 1 }
   }}
 ])`
- - Réponse :`[
+ - Réponse :```json
+[
   { _id: true, count: 4 },
   { _id: null, count: 1 },
   { _id: false, count: 1 }
-]`
+]```
 
 Niveau 2 — Regroupements
 ------------------------
@@ -772,11 +787,12 @@ Niveau 2 — Regroupements
   }},
   { "$sort": { "userCount": -1 } }
 ])`
- - Réponse : `[
+ - Réponse : ```json
+[
   { _id: 'Villeurbanne', userCount: 3 },
   { _id: 'Lyon', userCount: 3 },
   { _id: 'Vénissieux', userCount: 1 }
-]`
+]```
 
 5. Trouvez l'âge moyen par ville, trié par âge moyen décroissant.
  - Requête : `db.users.aggregate([
@@ -787,11 +803,12 @@ Niveau 2 — Regroupements
   }},
   { "$sort": { "avgAge": -1 } }
 ])`
- - Réponse : `[
+ - Réponse : ```json
+[
   { _id: 'Villeurbanne', avgAge: 42.666666666666664 },
   { _id: 'Lyon', avgAge: 32.666666666666664 },
   { _id: 'Vénissieux', avgAge: 25 }
-]`
+]```
 6. Identifiez les 3 tags les plus utilisés et le nombre d'utilisateurs pour chacun.
  - Requête : `db.users.aggregate([
    { "$unwind": "$tags" },
@@ -802,11 +819,12 @@ Niveau 2 — Regroupements
    { "$sort": { "count": -1 }},
    { "$limit": 3 }
  ])`
- - Réponse : `[
+ - Réponse : ```json
+[
   { _id: 'early-adopter', count: 3 },
   { _id: 'premium', count: 3 },
   { _id: 'new', count: 1 }
-]`
+]```
 
 Niveau 3 — Pipelines complexes
 ------------------------------
@@ -818,11 +836,12 @@ Niveau 3 — Pipelines complexes
        "residents": { "$addToSet": "$firstName" }
    }}
  ])`
- - Réponse : `[
+ - Réponse : ```json
+[
   { _id: 'Villeurbanne', residents: [ 'Chloé', 'François' ] },
   { _id: 'Lyon', residents: [ 'Alice', 'Bruno', 'Emma' ] },
   { _id: 'Vénissieux', residents: [ 'David' ] }
-]`
+]```
 8. Calculez la proportion d'utilisateurs vérifiés par ville (champ calculé : verifiedCount /totalCount).
  - Requête : `db.users.aggregate([
   { "$unwind": "$addresses" },
@@ -840,7 +859,8 @@ Niveau 3 — Pipelines complexes
       "verifiedRatio": { "$divide": ["$verifiedCount", "$totalCount"] }
   }}
 ])`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: 'Villeurbanne',
     totalCount: 3,
@@ -854,7 +874,7 @@ Niveau 3 — Pipelines complexes
     verifiedCount: 1,
     verifiedRatio: 1
   }
-]`
+]```
 9. Trouvez les utilisateurs qui ont le plus grand nombre d'adresses ($project pour ajouter un champ addressCount).
  - Requête : `db.users.aggregate([
    { "$project": {
@@ -864,7 +884,8 @@ Niveau 3 — Pipelines complexes
    }},
    { "$sort": { "addressCount": -1 } }
  ])`
- - Réponse : `[
+ - Réponse : ```json
+[
   {
     _id: ObjectId('6a3a5f7b2200da061e9df8a5'),
     email: 'chloe.bernard@mail.com',
@@ -901,7 +922,7 @@ Niveau 3 — Pipelines complexes
     firstName: 'François',
     addressCount: 1
   }
-]`
+]```
 
 Stratégie d'indexation
 ======================
