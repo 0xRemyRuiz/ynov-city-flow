@@ -14,8 +14,6 @@ if [ -f /tmp/init.cypher ]; then
     echo "Seeding Neo4j Graph Database..."
     cat /tmp/init.cypher | cypher-shell -u neo4j -p cityflow2025 --database neo4j
     echo "Neo4j seeding completed successfully."
-else
-    echo "Warning: /tmp/init.cypher not found."
 fi
 
 # Keep the container alive by waiting on the background neo4j process
