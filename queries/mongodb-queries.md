@@ -109,9 +109,146 @@ userId_1_startTime_-1
 
 US-M2 : véhicules d'un type donné dans un arrondissement
 --------------------------------------------------------
-
+ - Requêtes :
+ 1. db.vehicles.find(
+  { type: "scooter", city: "Vénissieux" },
+  { _id: 1, brand: 1, plate: 1, batteryLevel: 1, city: 1 }
+);
+2. db.vehicles.find(
+  { type: "bike", city: "Lyon 1er" },
+  { _id: 1, brand: 1, plate: 1, isElectric: 1, city: 1 }
+);
+- Justification :La requête est très simple. On filtre seulement sur deux champs qui doivent être égaux : le type et la ville. Il n'y a aucune transformation à faire, donc pas besoin d'agrégation. On affiche uniquement les informations utiles pour l'admin : la plaque, la batterie et la marque. Cela permet de ne pas surcharger la réponse. Le filtre sur la ville correspond directement au champ qui est enregistré dans les véhicules, ce qui évite de faire des jointures.
+ - Réponse :
+ 1. [
+  { _id: 'v006', brand: 'Lime',  plate: 'SC-217', batteryLevel: 78, city: 'Vénissieux' },
+  { _id: 'v007', brand: 'Tier',  plate: 'SC-887', batteryLevel: 53, city: 'Vénissieux' }
+]
+2. [
+  { _id: 'v006', brand: 'Lime',  plate: 'SC-217', batteryLevel: 78, city: 'Vénissieux' },
+  { _id: 'v007', brand: 'Tier',  plate: 'SC-887', batteryLevel: 53, city: 'Vénissieux' }
+]
 US-M3 : statistiques globales
 -----------------------------
-
+ - Requêtes :
+ Requête A — Nombre de trajets par jour
+ db.trips.aggregate([
+  {
+    $group: {
+      _id: { $dateToString: { format: "%Y-%m-%d", date: "$startTime" } },
+      tripsCount:      { $sum: 1 },
+      totalDistanceKm: { $sum: "$distanceKm" },
+      avgCost:         { $avg: "$cost" }
+    }
+  },
+  { $sort: { _id: -1 } }
+]);
+Requête B — Distance moyenne globale et extrêmes
+db.trips.aggregate([
+  {
+    $group: {
+      _id: null,
+      totalTrips:      { $sum: 1 },
+      avgDistanceKm:   { $avg: "$distanceKm" },
+      minDistanceKm:   { $min: "$distanceKm" },
+      maxDistanceKm:   { $max: "$distanceKm" },
+      avgDurationMin:  { $avg: "$durationMin" },
+      totalRevenueEur: { $sum: "$cost" }
+    }
+  }
+]);
+Requête C — Top 5 des conducteurs (par distance totale)
+db.trips.aggregate([
+  {
+    $group: {
+      _id:             "$userId",
+      totalTrips:      { $sum: 1 },
+      totalDistanceKm: { $sum: "$distanceKm" },
+      totalCost:       { $sum: "$cost" }
+    }
+  },
+  { $sort: { totalDistanceKm: -1 } },
+  { $limit: 5 },
+  {
+    $lookup: {
+      from:         "users",
+      localField:   "_id",
+      foreignField: "_id",
+      as:           "userInfo"
+    }
+  },
+  {
+    $project: {
+      totalTrips: 1, totalDistanceKm: 1, totalCost: 1,
+      firstName: { $arrayElemAt: ["$userInfo.firstName", 0] },
+      lastName:  { $arrayElemAt: ["$userInfo.lastName",  0] }
+    }
+  }
+]);
+ - Justification :La fonction $dateToString dans le groupe _id permet de regrouper les résultats par jour calendaire, sans tenir compte de l’heure, et sans avoir besoin de préparation préalable. Les trois requêtes sont bien séparées, chacune répond à un besoin analytique précis et peut être réutilisée facilement de son côté, ce qui rend le tableau de bord plus modulaire. Le $lookup dans la requête C est justifié car il s’agit d’une analyse peu fréquente : on accepte le coût supplémentaire de la jointure pour enrichir les résultats avec les noms des conducteurs
+  - Réponse :
+  Requête A :
+  [
+  { _id: '2026-06-22', tripsCount: 2, totalDistanceKm: 27.62, avgCost: 10.40 },
+  { _id: '2026-06-21', tripsCount: 3, totalDistanceKm: 27.42, avgCost: 8.78  },
+  { _id: '2026-06-18', tripsCount: 2, totalDistanceKm: 22.53, avgCost: 9.74  },
+  // ...
+]
+Requête B :
+[
+  {
+    _id: null,
+    totalTrips: 30,
+    avgDistanceKm: 10.77,
+    minDistanceKm: 1.29,
+    maxDistanceKm: 27.9,
+    avgDurationMin: 38.97,
+    totalRevenueEur: 323.18
+  }
+]
+Requête C — Top 5 conducteurs :
+[
+  { _id: 'u002', firstName: 'Bruno',   lastName: 'Martin',   totalTrips: 7, totalDistanceKm: 91.17, totalCost: 94.01 },
+  { _id: 'u001', firstName: 'Alice',   lastName: 'Dupont',   totalTrips: 6, totalDistanceKm: 86.60, totalCost: 87.34 },
+  { _id: 'u013', firstName: 'Marco',   lastName: 'Henry',    totalTrips: 2, totalDistanceKm: 12.79, totalCost: 13.15 },
+  { _id: 'u009', firstName: 'Inès',    lastName: 'Faure',    totalTrips: 3, totalDistanceKm: 19.51, totalCost: 21.08 },
+  { _id: 'u014', firstName: 'Nadia',   lastName: 'Rousseau', totalTrips: 2, totalDistanceKm: 21.74, totalCost: 15.89 }
+]
 US-M4 : recherche full-text
 ---------------------------
+Prérequis : créer l'index text : db.trips.createIndex({ comment: "text" }, { name: "comment_text" });
+ - Requêtes :
+ 1. Recherche simple : trajets mentionnant "batterie"
+db.trips.find(
+  { $text: { $search: "batterie" } },
+  { score: { $meta: "textScore" }, comment: 1, userId: 1, startCity: 1, _id: 0 }
+).sort({ score: { $meta: "textScore" } });
+2. Recherche multi-mots (OR implicite) : "vélo" ou "pneu"
+db.trips.find(
+  { $text: { $search: "vélo pneu" } },
+  { score: { $meta: "textScore" }, comment: 1, userId: 1, _id: 0 }
+).sort({ score: { $meta: "textScore" } });
+3. Phrase exacte
+db.trips.find(
+  { $text: { $search: "\"trajet agréable\"" } },
+  { comment: 1, userId: 1, _id: 0 }
+);
+4. Exclusion : trajets mentionnant "trajet" mais pas "embouteillage"
+db.trips.find(
+  { $text: { $search: "trajet -embouteillage" } },
+  { comment: 1, userId: 1, _id: 0 }
+);
+ - Justification :L’opérateur $text utilise un index inversé créé avec createIndex sur le champ comment. Sans cet index, la recherche dans tout le texte obligerait MongoDB à lire tous les documents de la collection. Le $meta textScore donne un score de pertinence calculé par MongoDB selon la fréquence des mots, ce qui permet de trier les résultats du plus pertinent au moins pertinent. La syntaxe de recherche supporte naturellement plusieurs mots en même temps, l’exclusion avec le signe moins et les phrases exactes entre guillemets.
+  - Réponse :
+1. Recherche "batterie"
+[
+  { userId: 'u001', startCity: 'Vénissieux',  comment: "Scooter rapide mais batterie faible à l'arrivée." },
+  { userId: 'u014', startCity: 'Lyon 8e',     comment: "Scooter rapide mais batterie faible à l'arrivée." },
+  { userId: 'u011', startCity: 'Lyon 7e',     comment: "Scooter rapide mais batterie faible à l'arrivée." }
+]
+2. Recherche "trajet agréable"
+[
+  { userId: 'u002', comment: 'Trajet agréable, vélo en bon état.' },
+  { userId: 'u004', comment: 'Trajet agréable, vélo en bon état.' },
+  { userId: 'u001', comment: 'Trajet agréable, vélo en bon état.' }
+]
