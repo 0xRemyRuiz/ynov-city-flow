@@ -6,9 +6,9 @@
 
 ## Mongodb
  - [X] seed
- - [ ] modelisation
+ - [X] modelisation
  - [X] TPs
- - [ ] queries (1/4)
+ - [X] queries (1/4)
 
 ## Redis
  - [X] seed
