@@ -13,7 +13,7 @@
 ## Redis
  - [X] seed
  - [X] modelisation
- - [ ] TPs (à compléter)
+ - [X] TPs (à compléter)
  - [X] queries (titres à remplir)
 
 ## Neo4j
