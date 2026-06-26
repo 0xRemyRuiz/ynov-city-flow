@@ -100,7 +100,7 @@ WITH CLUSTERING ORDER BY (date ASC, minute ASC);
 4. Estimez la taille d'une partition typique avec votre modélisation.
  - Réponse : Pour la table 1 pour 1 cpateur pour 1 mois on aurait 60 mesures/h × 24h × 30j = 43 200 lignes. Si l'on multiplie par 136 (on reprend notre estimation précédente même si on a changé notre schéma entre temps) et on obtient 5 848 000 donc 5,8Mo. Pour la table 2 on peut imaginer qu'on serait sur quelque chose de l'ordre de 150 octet par ligne et si l'on pose pour 1 région sur 1 heure  5000 capteurs ÷ 13 régions × 60 minutes = 23 100 lignes et donc on aurait environ 3 465 000 soit 3,5Mo.
 5. Bonus : que se passerait-il avec PRIMARY KEY (sensor_id, timestamp) ?
-
+ - Réponse : 
 
 VOTRE TOUR — Exercice 2 : Réseau social messages
 Vous gérez les messages privés d'un réseau social. Chaque conversation a 2 utilisateurs et des centaines
@@ -111,13 +111,33 @@ Requêtes attendues :
 - Q3 : Recherche d'un message dans une conversation par mot-clé (bonus)
 Travail demandé :
 1. Modélisez les tables pour Q1 et Q2.
+```CQL
+CREATE TABLE IF NOT EXISTS messages_by_conversation (
+    conversation_id uuid,
+    bucket          text,
+    sent_at         timestamp,
+    message_id      timeuuid,
+    sender_id       uuid,
+    content         text,
+    PRIMARY KEY ((conversation_id, bucket), sent_at, message_id)
+) WITH CLUSTERING ORDER BY (sent_at DESC);
+
+CREATE TABLE IF NOT EXISTS conversations_by_user (
+    user_id          uuid,
+    last_message_at  timestamp,
+    conversation_id  uuid,
+    other_user_id    uuid,
+    PRIMARY KEY (user_id, last_message_at)
+) WITH CLUSTERING ORDER BY (last_message_at DESC);
+```
 2. Réfléchissez : comment représenter une conversation à deux participants ? Par convention (user1_id <
 user2_id) ou par un UUID dédié ?
+ - Réponse : **UUID dédié** : nécessite une table de mapping pour retrouver l'ID à partir des deux users, mais beaucoup plus flexible. La plupart des messageries finissent par ajouter des groupes ou des fonctionnalités où la conversation est une entité à part entière, donc autant prévoir cette extensibilité dès le départ.
 3. Pour la pagination des messages anciens, comment faire ?
+ - Réponse : On utilise un curseur quand le bucket courant est épuisé (moins de 50 résultats), l'application requête le bucket précédent. Cassandra propose aussi une pagination automatique via `fetch_size`, qui convient bien au scroll infini.
 4. Pour Q3 (recherche par mot-clé), expliquez pourquoi Cassandra n'est pas adaptée et quelle techno
 utiliser à la place.
-
-
+ - Réponse : Cassandra indexe par clé, pas par contenu textuel. Pour chercher un mot dans des messages, il faudrait scanner toute la partition avec `ALLOW FILTERING` ce qui à terme, une fois le volume de données aura augmenté, va créer un problème de performance. Un moteur comme elastic search est fait pour la recherche textuelle.
 
 VOTRE TOUR — Exercice 3 : E-commerce - logs de visites
 Vous loggez chaque visite de page produit sur un e-commerce :

@@ -45,6 +45,25 @@ CREATE TABLE IF NOT EXISTS measures_by_region (
     PRIMARY KEY ((region, date, heure), minute, uuid)
 ) WITH CLUSTERING ORDER BY (minute ASC, uuid ASC);
 
+CREATE TABLE IF NOT EXISTS messages_by_conversation (
+    conversation_id uuid,
+    bucket          text,
+    sent_at         timestamp,
+    message_id      timeuuid,
+    sender_id       uuid,
+    content         text,
+    PRIMARY KEY ((conversation_id, bucket), sent_at, message_id)
+) WITH CLUSTERING ORDER BY (sent_at DESC);
+
+CREATE TABLE IF NOT EXISTS conversations_by_user (
+    user_id          uuid,
+    last_message_at  timestamp,
+    conversation_id  uuid,
+    other_user_id    uuid,
+    PRIMARY KEY (user_id, last_message_at)
+) WITH CLUSTERING ORDER BY (last_message_at DESC);
+
+
 ---
 -- Insertion de données de test générées par IA
 ---
