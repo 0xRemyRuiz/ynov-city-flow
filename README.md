@@ -1,11 +1,11 @@
 YNOV-CITY-FLOW
 ==============
 
-Présentation
-------------
-
 Equipe
 ------
+Hugo JANUTOLO
+Habib Hassana OUSMANOU DAOUDA
+Rémy RUIZ
 
 Lancement
 ---------

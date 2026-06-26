@@ -1,64 +1,64 @@
 services:
-  mongodb:
-    image: mongo:7.0
-    container_name: cityflow-mongo
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    volumes:
-      - ./seed/mongodb/init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - mongo_data:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: cityflow2025
-    networks:
-      - cityflow-net
+  # mongodb:
+  #   image: mongo:7.0
+  #   container_name: cityflow-mongo
+  #   restart: unless-stopped
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - ./seed/mongodb/init.js:/docker-entrypoint-initdb.d/init.js:ro
+  #     - mongo_data:/data/db
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: admin
+  #     MONGO_INITDB_ROOT_PASSWORD: cityflow2025
+  #   networks:
+  #     - cityflow-net
 
-  mongo-express:
-    image: mongo-express:1.0.2
-    container_name: cityflow-mongo-express
-    restart: unless-stopped
-    ports:
-      - "8081:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: cityflow2025
-      ME_CONFIG_MONGODB_URL: mongodb://admin:cityflow2025@mongodb:27017/
-      ME_CONFIG_BASICAUTH_USERNAME: student
-      ME_CONFIG_BASICAUTH_PASSWORD: nosql2025
-    depends_on:
-      - mongodb
-    networks:
-      - cityflow-net
+  # mongo-express:
+  #   image: mongo-express:1.0.2
+  #   container_name: cityflow-mongo-express
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8081:8081"
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: cityflow2025
+  #     ME_CONFIG_MONGODB_URL: mongodb://admin:cityflow2025@mongodb:27017/
+  #     ME_CONFIG_BASICAUTH_USERNAME: student
+  #     ME_CONFIG_BASICAUTH_PASSWORD: nosql2025
+  #   depends_on:
+  #     - mongodb
+  #   networks:
+  #     - cityflow-net
 
-  redis:
-    image: redis:7-alpine
-    container_name: cityflow-redis
-    restart: unless-stopped
-    ports:
-      - "6380:6379"
-    volumes:
-      - ./seed/redis/init.txt:/tmp/init.txt:ro
-      - ./seed/redis/entry.sh:/tmp/entrypoint.sh:ro
-      - redis_data:/data
-    command: sh /tmp/entrypoint.sh
-    networks:
-      - cityflow-net
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: cityflow-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6380:6379"
+  #   volumes:
+  #     - ./seed/redis/init.txt:/tmp/init.txt:ro
+  #     - ./seed/redis/entry.sh:/tmp/entry.sh:ro
+  #     - redis_data:/data
+  #   command: sh /tmp/entry.sh
+  #   networks:
+  #     - cityflow-net
 
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: cityflow-redis-commander
-    restart: unless-stopped
-    ports:
-      - "8082:8081"
-    environment:
-      REDIS_HOSTS: local:redis:6379:0:cityflow2025
-      HTTP_USER: student
-      HTTP_PASSWORD: nosql2025
-    depends_on:
-      - redis
-    networks:
-      - cityflow-net
+  # redis-commander:
+  #   image: rediscommander/redis-commander:latest
+  #   container_name: cityflow-redis-commander
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8082:8081"
+  #   environment:
+  #     REDIS_HOSTS: local:redis:6379:0:cityflow2025
+  #     HTTP_USER: student
+  #     HTTP_PASSWORD: nosql2025
+  #   depends_on:
+  #     - redis
+  #   networks:
+  #     - cityflow-net
 
   cassandra:
     image: cassandra:4.1
@@ -67,6 +67,8 @@ services:
     ports:
       - "9042:9042"
     volumes:
+      - ./seed/cassandra/init.cql:/tmp/init.cql:ro
+      - ./seed/cassandra/entry.sh:/tmp/entry.sh:ro
       - cassandra_data:/var/lib/cassandra
     environment:
       CASSANDRA_CLUSTER_NAME: "CityFlow"
@@ -80,6 +82,7 @@ services:
       timeout: 10s
       retries: 10
       start_period: 60s
+    command: sh /tmp/entry.sh
     networks:
       - cityflow-net
 
@@ -99,26 +102,26 @@ services:
     networks:
       - cityflow-net
 
-  neo4j:
-    image: neo4j:5-community
-    container_name: cityflow-neo4j
-    restart: unless-stopped
-    ports:
-      - "7474:7474" # HTTP — interface Neo4j Browser
-      - "7687:7687" # Bolt — protocole binaire (drivers)
-    volumes:
-      - ./seed/neo4j/init.cypher:/tmp/init.cypher:ro
-      - ./seed/neo4j/entry.sh:/usr/local/bin/entrypoint.sh:ro
-      - neo4j_data:/data
-      - neo4j_logs:/logs
-    command: bash /usr/local/bin/entrypoint.sh
-    environment:
-      NEO4J_AUTH: neo4j/cityflow2025
-      NEO4J_dbms_memory_heap_max__size: 512M
-      NEO4J_dbms_memory_pagecache_size: 256M
-      NEO4J_PLUGINS: '["apoc"]'
-    networks:
-      - cityflow-net
+  # neo4j:
+  #   image: neo4j:5-community
+  #   container_name: cityflow-neo4j
+  #   restart: unless-stopped
+  #   ports:
+  #     - "7474:7474" # HTTP — interface Neo4j Browser
+  #     - "7687:7687" # Bolt — protocole binaire (drivers)
+  #   volumes:
+  #     - ./seed/neo4j/init.cypher:/tmp/init.cypher:ro
+  #     - ./seed/neo4j/entry.sh:/usr/local/bin/entry.sh:ro
+  #     - neo4j_data:/data
+  #     - neo4j_logs:/logs
+  #   command: bash /usr/local/bin/entry.sh
+  #   environment:
+  #     NEO4J_AUTH: neo4j/cityflow2025
+  #     NEO4J_dbms_memory_heap_max__size: 512M
+  #     NEO4J_dbms_memory_pagecache_size: 256M
+  #     NEO4J_PLUGINS: '["apoc"]'
+  #   networks:
+  #     - cityflow-net
 
 volumes:
   mongo_data:

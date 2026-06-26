@@ -62,6 +62,9 @@ CREATE (charlie)-[:RECOMMENDS {message: 'Super coéquipière', date: date('2023-
 /*
  * Netflix-like TP
  */
+// DEBUG!
+// TOFIX: MATCH is bugged
+// !DEBUG
 // Utilisateurs (MATCH to integrate with previous users)
 MATCH (u:User {name: 'Alice'}) SET u.subscription = 'Premium'
 MATCH (u:User {name: 'Bob'}) SET u.subscription = 'Standard'

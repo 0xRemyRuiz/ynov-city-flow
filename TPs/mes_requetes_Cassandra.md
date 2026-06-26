@@ -1,13 +1,73 @@
-Partie 5
 VOTRE TOUR — Exercice 1: IoT capteurs météo
+-------------------------------------------
 Vous gérez 5 000 capteurs météo répartis en France. Chaque capteur envoie une mesure par minute
 (température, humidité, pression).
+Modélisation de la table :
+```CQL
+CREATE TABLE sensor_history_by_minute (
+    uuid uuid,
+    date text,       // Format "aaaammjj"
+    mois text,       // Format "aaaamm"
+    minute smallint,
+    temperature float,
+    humidite tinyint,
+    pression smallint,
+    PRIMARY KEY ((uuid), date, mois, minute)
+) WITH CLUSTERING ORDER BY (date ASC, mois ASC, minute ASC);
+```
 Requêtes attendues :
 - Q1 : Historique d'un capteur sur un mois
+ - Requête :
+```CQL
+SELECT date, temperature, humidite, pression
+FROM sensor_history_by_minute
+WHERE uuid = 7c9e6679-7425-40de-944b-e07fc1f90ae7
+  AND mois = '202606';
+```
+ - Réponse :
+```
+  date     | temperature | humidite | pression
+----------+-------------+----------+----------
+ 20260626 |        22.6 |       55 |     1012
+ 20260626 |        22.7 |       56 |     1012
+ 20260626 |        22.9 |       56 |     1012
+ 20260626 |          23 |       55 |     1013
+ 20260626 |        23.2 |       54 |     1013
+ 20260626 |        23.3 |       54 |     1013
+ 20260626 |        23.4 |       53 |     1013
+ 20260626 |        23.6 |       53 |     1014
+ 20260626 |        23.7 |       52 |     1014
+ 20260626 |        23.8 |       51 |     1014
+
+(10 rows)
+```
 - Q2 : Mesures les plus récentes (les 10 dernières) d'un capteur
+ - Requête :
+```CQL
+SELECT minute, temperature, humidite, pression
+FROM sensor_history_by_minute
+WHERE uuid = 7c9e6679-7425-40de-944b-e07fc1f90ae7
+  AND mois = '202606'
+ORDER BY date DESC, minute DESC
+LIMIT 10;
+```
+ - Résultat :
+```
+```
 - Q3 : Toutes les mesures d'une journée pour une région donnée
+```CQL
+SELECT heure, minute, uuid, temperature
+FROM measures_by_region
+WHERE region = 'ile-de-france' AND date = '20260626'
+  AND heure IN (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23);
+```
+ - Résultat :
+```
+```
 Travail demandé :
 1. Calculez le volume de données par an : 5000 capteurs × 60 mesures/h × 24h × 365j.
+ - Réponse : Le résultat de la multiplication donne 2 628 000 000 de requête. En imaginant que l'on a 5 colonnes de données régulières minute (smallint), température (float), humidité (tinyint), pression (smallint), mois (text de taille 6) et 2 colonnes indexées avec la date (text de taille 8) et un uuid (uuid). On obtient le calcul `2 + 4 + 1 + 2 + 6 + 8 + 16 + 15 × 5 + 23 = 136`. Le 15 est l'overhead constant par colonne et le 23 l'overhead constant par ligne. Ensuite il suffit de faire `136 × 2 628 000 000 = 357 408 000 000 octets` et donc 357 giga octets. A cela il faut rajouter le coût de la clé de cluster qui est non négligeable et si l'on choisissait la date comme clé de cluster on aurait 16 octets par ligne en plus et donc cela devrait rajouter environ 36Go.
+ Ceci est une mesure avant compression. La compression peut varier de 50% à 80% en fonction des données et des algorithmes utilisés. La compaction elle, n'intervient que dans un contexte d'amélioration de la vitesse et peut donc prendre de +5% à +100% d'espace de stockage ! Idemme, le facteur de redondance multiplie d'autant l'espace pris (si RF = 3 alors 393 × 3).
 2. Proposez une modélisation avec bucketing temporel (partition par jour ou par mois ?).
 3. Pour chaque table, justifiez le choix de la partition key.
 4. Estimez la taille d'une partition typique avec votre modélisation.
