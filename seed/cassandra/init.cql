@@ -11,7 +11,7 @@ WITH replication = {
 
 USE tp_cassandra ;
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
 	user_id uuid PRIMARY KEY,
 	email text,
 	first_name text,
@@ -33,15 +33,15 @@ CREATE TABLE IF NOT EXISTS sensor_history_by_minute (
     PRIMARY KEY ((uuid), mois, date, minute)
 ) WITH CLUSTERING ORDER BY (mois ASC, date ASC, minute ASC) ;
 
-CREATE TABLE measures_by_region (
-    region      text,
-    date        text,        -- '20260626'
-    heure       int,         -- bucket horaire (0 à 23) pour limiter la taille de partition
-    minute      int,         -- minute dans la journée (0 à 1439)
+CREATE TABLE IF NOT EXISTS measures_by_region (
     uuid        uuid,
+    region      text,
+    date        text,             -- '20260626'
+    heure       smallint,         -- bucket horaire (0 à 23) pour limiter la taille de partition
+    minute      smallint,         -- minute dans la journée (0 à 1439)
     temperature float,
-    humidite    int,
-    pression    int,
+    humidite    tinyint,
+    pression    smallint,
     PRIMARY KEY ((region, date, heure), minute, uuid)
 ) WITH CLUSTERING ORDER BY (minute ASC, uuid ASC);
 

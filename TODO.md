@@ -2,19 +2,19 @@
 
 ## Global
  - [ ] Architecture
- - [ ] README (à compléter)
+ - [X] README
 
 ## Mongodb
  - [X] seed
  - [X] modelisation
  - [X] TPs
- - [X] queries (4/4)
+ - [X] queries
 
 ## Redis
  - [X] seed
  - [X] modelisation
- - [X] TPs (à compléter)
- - [X] queries (titres à remplir)
+ - [X] TPs
+ - [X] queries
 
 ## Neo4j
  - [ ] seed (complète pour la partie TP)
@@ -23,7 +23,7 @@
  - [ ] queries
 
 ## Cassandra
- - [ ] seed
+ - [ ] seed (partielle)
  - [ ] modelisation
- - [ ] TPs
+ - [ ] TPs (commencés)
  - [ ] queries

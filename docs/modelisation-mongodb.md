@@ -1,5 +1,5 @@
 # CityFlow — Modélisation MongoDB
-## Fichier : docs/modelisation-mongodb.md
+
 ---
 
 ## Contexte

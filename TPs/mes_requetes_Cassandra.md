@@ -53,6 +53,20 @@ LIMIT 10;
 ```
  - Résultat :
 ```
+ minute | temperature | humidite | pression
+--------+-------------+----------+----------
+    930 |        25.3 |       49 |     1014
+    630 |        22.8 |       59 |     1013
+    900 |        24.9 |       53 |     1013
+    540 |        20.8 |       66 |     1013
+    990 |        25.7 |       50 |     1013
+    450 |          20 |       70 |     1013
+    930 |        25.1 |       52 |     1013
+    570 |        21.3 |       64 |     1012
+    810 |        23.7 |       57 |     1013
+    390 |        18.9 |       72 |     1012
+
+(10 rows)
 ```
 - Q3 : Toutes les mesures d'une journée pour une région donnée
 ```CQL
@@ -63,14 +77,28 @@ WHERE region = 'ile-de-france' AND date = '20260626'
 ```
  - Résultat :
 ```
+ heure | minute | uuid                                 | temperature
+-------+--------+--------------------------------------+-------------
+    15 |    900 | 6a2f41a3-c54c-fce8-32d2-000000000001 |          25
+    15 |    930 | 7c9e6679-7425-40de-944b-e07fc1f90ae7 |        25.3
+
+(2 rows)
 ```
 Travail demandé :
 1. Calculez le volume de données par an : 5000 capteurs × 60 mesures/h × 24h × 365j.
  - Réponse : Le résultat de la multiplication donne 2 628 000 000 de requête. En imaginant que l'on a 5 colonnes de données régulières minute (smallint), température (float), humidité (tinyint), pression (smallint), mois (text de taille 6) et 2 colonnes indexées avec la date (text de taille 8) et un uuid (uuid). On obtient le calcul `2 + 4 + 1 + 2 + 6 + 8 + 16 + 15 × 5 + 23 = 136`. Le 15 est l'overhead constant par colonne et le 23 l'overhead constant par ligne. Ensuite il suffit de faire `136 × 2 628 000 000 = 357 408 000 000 octets` et donc 357 giga octets. A cela il faut rajouter le coût de la clé de cluster qui est non négligeable et si l'on choisissait la date comme clé de cluster on aurait 16 octets par ligne en plus et donc cela devrait rajouter environ 36Go.
  Ceci est une mesure avant compression. La compression peut varier de 50% à 80% en fonction des données et des algorithmes utilisés. La compaction elle, n'intervient que dans un contexte d'amélioration de la vitesse et peut donc prendre de +5% à +100% d'espace de stockage ! Idemme, le facteur de redondance multiplie d'autant l'espace pris (si RF = 3 alors 393 × 3).
 2. Proposez une modélisation avec bucketing temporel (partition par jour ou par mois ?).
+ - Réponse : Le bucket journalier (date en partition) nous aurait obligé à scanner 30 partitions au lieu d'une seule. Le bucket annuel aurait fait exploser la taille de partition. Le bucket par mois est le meilleur, il permettrait d'améliorer notre table pour limiter la taille d'une partition à 1 mois de données.
+```CQL
+PRIMARY KEY ((uuid, mois), date, minute)
+WITH CLUSTERING ORDER BY (date ASC, minute ASC);
+```
 3. Pour chaque table, justifiez le choix de la partition key.
+ - Réponse : Pour notre table 1 (sensor_history_by_minute) le "uuid" distribue les écritures sur tout le cluster (5000 valeurs distinctes hashées → pas de hot partition). Et si on prend en compte notre amélioration, la clé "mois" limite la taille de partition dans le temps.
+ Pour la table 2 (measures_by_region) on a choisi "region" pour pouvoir faire la requête Q3 puisque contrairement au SQL qui permet d'adapter la requête, Cassandra demande d'adapter la base quite à dupliquer de la données. Les clés "date" et "heure" permettent de limiter dans le temps.
 4. Estimez la taille d'une partition typique avec votre modélisation.
+ - Réponse : Pour la table 1 pour 1 cpateur pour 1 mois on aurait 60 mesures/h × 24h × 30j = 43 200 lignes. Si l'on multiplie par 136 (on reprend notre estimation précédente même si on a changé notre schéma entre temps) et on obtient 5 848 000 donc 5,8Mo. Pour la table 2 on peut imaginer qu'on serait sur quelque chose de l'ordre de 150 octet par ligne et si l'on pose pour 1 région sur 1 heure  5000 capteurs ÷ 13 régions × 60 minutes = 23 100 lignes et donc on aurait environ 3 465 000 soit 3,5Mo.
 5. Bonus : que se passerait-il avec PRIMARY KEY (sensor_id, timestamp) ?
 
 
