@@ -8,7 +8,7 @@
  - [X] seed
  - [X] modelisation
  - [X] TPs
- - [X] queries (1/4)
+ - [X] queries (4/4)
 
 ## Redis
  - [X] seed
